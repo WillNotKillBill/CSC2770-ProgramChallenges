@@ -72,10 +72,11 @@ int main() {
     close(sockfd);
 
     ntpCurrent = (ntohl(packet.trans_ts_sec) - NTP_TIMESTAMP_DELTA);
-    printf("NTP time: %s", ctime(&current_time));
+    printf("NTP time: %s", ctime(&ntpCurrent));
 
     double timeDiff = difftime(localTime, ntpCurrent);
-    printf("The time difference is %.21f seconds\n," timeDiff);
+    printf("The time difference is %.21f seconds\n", timeDiff);
+
 
     return 0;
 }
