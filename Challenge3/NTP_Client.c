@@ -40,6 +40,15 @@ int main() {
     struct sockaddr_in serv_addr;
     ntp_packet packet;
 
+    time_t localTime;
+    struct tm *local_Time;
+
+    localTime = time(NULL);
+    local_Time = localtime(&localTime);
+    printf("Local time: %s", asctime(local_Time));
+
+    time_t ntpCurrent;
+
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0)
         error("ERROR opening socket");
@@ -62,8 +71,11 @@ int main() {
 
     close(sockfd);
 
-    time_t current_time = (ntohl(packet.trans_ts_sec) - NTP_TIMESTAMP_DELTA);
+    ntpCurrent = (ntohl(packet.trans_ts_sec) - NTP_TIMESTAMP_DELTA);
     printf("NTP time: %s", ctime(&current_time));
+
+    double timeDiff = difftime(localTime, ntpCurrent);
+    printf("The time difference is %.21f seconds\n," timeDiff);
 
     return 0;
 }
