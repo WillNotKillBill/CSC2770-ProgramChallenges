@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
@@ -9,7 +10,15 @@
 
 void *connection_handler(void *socket_desc) {
     int sock = *(int*)socket_desc;
+    char buffer[1024] = {0}; //Buffer for input
+    char method[16], url[1024], protocol[16], response[1024];
     char *hello = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 12\r\n\r\nHello, world!";
+    
+    read(sock, buffer, 1024); //Read data to buffer
+    
+    sscanf(buffer, "%15s %1023s %15s", method, url, protocol); //Pauses request
+    snprintf(response, sizeof(response), hello, method, url, protocol);
+    
     write(sock, hello, strlen(hello));
     printf("Response sent\n");
     close(sock);
@@ -21,7 +30,8 @@ int main() {
     int server_fd, new_socket, *new_sock;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
-    //char buffer[1024];
+
+
 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
